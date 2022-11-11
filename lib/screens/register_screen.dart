@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:productos_app/providers/login_form_provider.dart';
-import 'package:productos_app/ui/ui.dart';
-import 'package:productos_app/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+import 'package:productos_app/providers/providers.dart';
+import 'package:productos_app/services/services.dart';
+import 'package:productos_app/ui/ui.dart';
+import 'package:productos_app/widgets/widgets.dart';
+
+class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,8 @@ class LoginScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    Text('Login', style: Theme.of(context).textTheme.headline4),
+                    Text('Crear cuenta',
+                        style: Theme.of(context).textTheme.headline4),
                     const SizedBox(height: 10),
                     ChangeNotifierProvider(
                       create: (_) => LoginFromProvider(),
@@ -31,14 +34,14 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 20),
               TextButton(
                 onPressed: () =>
-                    Navigator.pushReplacementNamed(context, 'register'),
+                    Navigator.pushReplacementNamed(context, 'login'),
                 style: ButtonStyle(
                   overlayColor:
                       MaterialStateProperty.all(Colors.indigo.withOpacity(0.1)),
                   shape: MaterialStateProperty.all(const StadiumBorder()),
                 ),
                 child: const Text(
-                  'Crear una cuenta',
+                  '¿Ya tienes una cuenta?',
                   style: TextStyle(fontSize: 18, color: Colors.black87),
                 ),
               ),
@@ -108,18 +111,27 @@ class _LoginForm extends StatelessWidget {
                   ? null
                   : () async {
                       FocusScope.of(context).unfocus();
+                      final authService =
+                          Provider.of<AuthService>(context, listen: false);
+
                       if (!loginForm.isValidForm()) return;
 
                       loginForm.isLoading = true;
 
-                      await Future.delayed(const Duration(seconds: 2));
-
                       // ignore: todo
                       // TODO: Validad si el login es correcto
+                      final String? errrorMessage = await authService
+                          .createUser(loginForm.email, loginForm.password);
+
+                      if (errrorMessage == null) {
+                        Navigator.pushReplacementNamed(context, 'home');
+                      } else {
+                        print(errrorMessage);
+                      }
+
                       loginForm.isLoading = false;
 
-                      // ignore: use_build_context_synchronously
-                      Navigator.pushReplacementNamed(context, 'home');
+                      
                     },
               child: Container(
                 padding:
