@@ -126,10 +126,11 @@ class _LoginForm extends StatelessWidget {
                       if (errrorMessage == null) {
                         Navigator.pushReplacementNamed(context, 'home');
                       } else {
+                        //TODO: Mostrar error en pantall
                         print(errrorMessage);
+                        loginForm.isLoading = false;
                       }
 
-                      loginForm.isLoading = false;
 
                       
                     },

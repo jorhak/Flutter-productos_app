@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productos_app/providers/login_form_provider.dart';
+import 'package:productos_app/services/services.dart';
 import 'package:productos_app/ui/ui.dart';
 import 'package:productos_app/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -108,18 +109,26 @@ class _LoginForm extends StatelessWidget {
                   ? null
                   : () async {
                       FocusScope.of(context).unfocus();
+                      final authService =
+                          Provider.of<AuthService>(context, listen: false);
+
                       if (!loginForm.isValidForm()) return;
 
                       loginForm.isLoading = true;
 
-                      await Future.delayed(const Duration(seconds: 2));
-
                       // ignore: todo
                       // TODO: Validad si el login es correcto
-                      loginForm.isLoading = false;
+                      final String? errrorMessage = await authService.login(
+                          loginForm.email, loginForm.password);
 
-                      // ignore: use_build_context_synchronously
-                      Navigator.pushReplacementNamed(context, 'home');
+                      if (errrorMessage == null) {
+                        Navigator.pushReplacementNamed(context, 'home');
+                      } else {
+                        //TODO: Mostrar error en pantall
+                        
+                        print(errrorMessage);
+                        loginForm.isLoading = false;
+                      }
                     },
               child: Container(
                 padding:
